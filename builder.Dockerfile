@@ -1,2 +1,16 @@
+FROM cruizba/ubuntu-dind
+
 ARG parent_image
-FROM $parent_image
+ENV PARENT_IMAGE=${parent_image}
+
+ENV TZ=US \
+    DEBIAN_FRONTEND=noninteractive
+
+RUN mkdir -p /app
+WORKDIR /app
+RUN apt-get update -y && apt-get install -y git python3 && rm -rf /var/lib/apt/lists*
+RUN git clone --depth=1 https://github.com/google/oss-fuzz.git
+COPY builder-internal.Dockerfile /app/
+COPY build.sh /app/
+
+CMD ["./build.sh"]

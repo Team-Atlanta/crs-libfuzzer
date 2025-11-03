@@ -1,3 +1,8 @@
-FROM gcr.io/oss-fuzz-base/base-runner
-COPY ./run_fuzzer_wrapper.sh /usr/local/bin/run_fuzzer_wrapper.sh
-ENTRYPOINT ["/usr/local/bin/run_fuzzer_wrapper.sh"]
+FROM cruizba/ubuntu-dind
+
+RUN mkdir -p /app
+WORKDIR /app
+COPY runner-internal.Dockerfile /app/
+COPY run.sh run_fuzzer_wrapper.sh /app/
+
+CMD ["./run.sh"]
