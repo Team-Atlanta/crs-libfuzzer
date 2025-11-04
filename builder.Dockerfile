@@ -10,7 +10,6 @@ RUN mkdir -p /app
 WORKDIR /app
 RUN apt-get update -y && apt-get install -y git python3 && rm -rf /var/lib/apt/lists*
 RUN git clone --depth=1 https://github.com/google/oss-fuzz.git
-COPY builder-internal.Dockerfile /app/
-COPY build.sh /app/
+COPY builder-internal.Dockerfile build.sh runner-internal.Dockerfile run_fuzzer_wrapper.sh /app/
 
 CMD ["./build.sh"]

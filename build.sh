@@ -24,3 +24,16 @@ docker build \
 # Run the container
 echo "Running container..."
 docker run --rm -v /out:/out -e 'FUZZING_LANGUAGE=c++' internal-builder
+
+# Build runner image
+echo "Building runner image..."
+docker build \
+    -f runner-internal.Dockerfile \
+    -t internal-runner \
+    .
+
+# Save runner image to /out/images/runner.tar
+echo "Saving runner image to /out/images/runner.tar..."
+mkdir -p /out/images
+docker save internal-runner -o /out/images/runner.tar
+echo "Runner image saved successfully"

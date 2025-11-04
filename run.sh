@@ -2,22 +2,25 @@
 
 set -eu
 
+start-docker.sh
+
 while ! docker info > /dev/null 2>&1; do
     echo "Waiting for Docker to be ready..."
     sleep 1
 done
 
-# Load the project image from tarball
-docker load -i /out/
+# Load the runner image from tarball
+echo "Loading runner image from /out/images/runner.tar..."
+docker load -i /out/images/runner.tar
 
-# Build the internal image using the loaded image as parent
-echo "Building internal image..."
-docker build \
-    --build-arg parent_image="$PARENT_IMAGE" \
-    -f builder-internal.Dockerfile \
-    -t internal-builder \
-    .
-
-# Run the container
-echo "Running container..."
-docker run --rm -v /out:/out -e 'FUZZING_LANGUAGE=c++' internal-builder
+# Run the runner container
+echo "Running fuzzer..."
+docker run --rm \
+    -v /out:/out \
+    -e CPUSET_CPUS="${CPUSET_CPUS}" \
+    -e MEMORY_LIMIT="${MEMORY_LIMIT}" \
+    -e RUN_FUZZER_MODE="${RUN_FUZZER_MODE}" \
+    -e HELPER="${HELPER}" \
+    -e FUZZING_ENGINE="${FUZZING_ENGINE}" \
+    -e SANITIZER="${SANITIZER}" \
+    internal-runner $@
