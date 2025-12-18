@@ -23,7 +23,19 @@ if [ -d "$SEED_CORPUS" ]; then
     cp -r "$SEED_CORPUS"/* "$CORPUS_OUT"/ 2>/dev/null || true
 fi
 
-FORK_JOBS="${FORK_JOBS:-$(getconf _NPROCESSORS_ONLN)}"
+# Count CPUs from range string (e.g., "0-7" or "0,2,4-6")
+count_cpus() {
+    count=0
+    for range in $(echo "$1" | tr ',' ' '); do
+        case "$range" in
+            *-*) count=$((count + ${range#*-} - ${range%-*} + 1)) ;;
+            *)   count=$((count + 1)) ;;
+        esac
+    done
+    echo "$count"
+}
+
+FORK_JOBS="${FORK_JOBS:-$(count_cpus "${CPUSET_CPUS:-0}")}"
 
 # Run libfuzzer in fork mode with crash tolerance
 "/out/${HARNESS_NAME}" \
