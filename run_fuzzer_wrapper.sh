@@ -23,12 +23,7 @@ if [ -d "$SEED_CORPUS" ]; then
     cp -r "$SEED_CORPUS"/* "$CORPUS_OUT"/ 2>/dev/null || true
 fi
 
-# Fork jobs: derive from CPUSET_CPUS if set, else default to 1
-if [ -n "${CPUSET_CPUS:-}" ]; then
-    FORK_JOBS=$(echo "$CPUSET_CPUS" | awk -F',' '{print NF}')
-else
-    FORK_JOBS="${FORK_JOBS:-1}"
-fi
+FORK_JOBS="${FORK_JOBS:-$(getconf _NPROCESSORS_ONLN)}"
 
 # Run libfuzzer in fork mode with crash tolerance
 "/out/${HARNESS_NAME}" \
