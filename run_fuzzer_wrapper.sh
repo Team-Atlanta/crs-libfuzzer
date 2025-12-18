@@ -23,9 +23,20 @@ if [ -d "$SEED_CORPUS" ]; then
     cp -r "$SEED_CORPUS"/* "$CORPUS_OUT"/ 2>/dev/null || true
 fi
 
-# Run libfuzzer
+# Fork jobs: derive from CPUSET_CPUS if set, else default to 1
+if [ -n "${CPUSET_CPUS:-}" ]; then
+    FORK_JOBS=$(echo "$CPUSET_CPUS" | awk -F',' '{print NF}')
+else
+    FORK_JOBS="${FORK_JOBS:-1}"
+fi
+
+# Run libfuzzer in fork mode with crash tolerance
 "/out/${HARNESS_NAME}" \
     "$CORPUS_OUT" \
     -artifact_prefix="${POV_OUT}/" \
     -max_total_time="$FUZZ_TIME" \
+    -fork="$FORK_JOBS" \
+    -ignore_crashes=1 \
+    -ignore_timeouts=1 \
+    -ignore_ooms=1 \
     "$@" || true
