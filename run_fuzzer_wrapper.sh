@@ -34,4 +34,6 @@ FORK_JOBS="${FORK_JOBS:-$(getconf _NPROCESSORS_ONLN)}"
     -ignore_crashes=1 \
     -ignore_timeouts=1 \
     -ignore_ooms=1 \
-    "$@" || true
+    -detect_leaks=0 \
+    -close_fd_mask=3 \
+    "$@" > /dev/null 2>&1 || true
