@@ -12,8 +12,8 @@ shift || true
 FUZZ_TIME="${FUZZ_TIME:-3600}"
 
 # Output directories (oss-crs structure)
-CORPUS_OUT="/artifacts/corpus/${HARNESS_NAME}"
-POV_OUT="/artifacts/povs/${HARNESS_NAME}"
+CORPUS_OUT="/artifacts/corpus"
+POV_OUT="/artifacts/povs"
 
 mkdir -p "$CORPUS_OUT" "$POV_OUT"
 
