@@ -2,5 +2,50 @@
 
 set -eu
 
-NCPU=$(echo "$CPUSET_CPUS" | awk -F',' '{print NF}')
-taskset -c $CPUSET_CPUS run_fuzzer $@ --fork=$NCPU -artifact_prefix=/artifacts/povs/ /artifacts/corpus
+# Mount points (oss-crs convention):
+#   /out        - Built fuzzers
+#   /work       - Working directory
+#   /artifacts  - Output artifacts (HOST_ARTIFACT_DIR)
+
+HARNESS_NAME="${1:-$HARNESS_NAME}"
+shift || true
+FUZZ_TIME="${FUZZ_TIME:-3600}"
+
+# Output directories (oss-crs structure)
+CORPUS_OUT="/artifacts/corpus"
+POV_OUT="/artifacts/povs"
+
+mkdir -p "$CORPUS_OUT" "$POV_OUT"
+
+# Seed corpus if exists
+SEED_CORPUS="/out/${HARNESS_NAME}_seed_corpus"
+if [ -d "$SEED_CORPUS" ]; then
+    cp -r "$SEED_CORPUS"/* "$CORPUS_OUT"/ 2>/dev/null || true
+fi
+
+# Count CPUs from range string (e.g., "0-7" or "0,2,4-6")
+count_cpus() {
+    count=0
+    for range in $(echo "$1" | tr ',' ' '); do
+        case "$range" in
+            *-*) count=$((count + ${range#*-} - ${range%-*} + 1)) ;;
+            *)   count=$((count + 1)) ;;
+        esac
+    done
+    echo "$count"
+}
+
+FORK_JOBS="${FORK_JOBS:-$(count_cpus "${CPUSET_CPUS:-0}")}"
+
+# Run libfuzzer in fork mode with crash tolerance
+"/out/${HARNESS_NAME}" \
+    "$CORPUS_OUT" \
+    -artifact_prefix="${POV_OUT}/" \
+    -max_total_time="$FUZZ_TIME" \
+    -fork="$FORK_JOBS" \
+    -ignore_crashes=1 \
+    -ignore_timeouts=1 \
+    -ignore_ooms=1 \
+    -detect_leaks=0 \
+    -close_fd_mask=3 \
+    "$@" > /dev/null 2>&1 || true
