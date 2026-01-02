@@ -17,6 +17,7 @@ docker load -i /out/images/runner.tar
 echo "Running fuzzer..."
 docker run --rm \
     -v /out:/out \
+    -v /artifacts:/artifacts \
     -e CPUSET_CPUS="${CPUSET_CPUS}" \
     -e MEMORY_LIMIT="${MEMORY_LIMIT}" \
     -e RUN_FUZZER_MODE="${RUN_FUZZER_MODE}" \
