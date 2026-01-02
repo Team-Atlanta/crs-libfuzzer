@@ -1,6 +1,8 @@
-#!/bin/sh
+#!/bin/bash
 
 set -eu
+
+cd /app
 
 echo "Using parent image: $PARENT_IMAGE"
 
@@ -18,7 +20,15 @@ docker build \
 
 # Run the container
 echo "Running container..."
-docker run --rm -v /out:/out -e 'FUZZING_LANGUAGE=c++' internal-builder
+volume_args=()
+if [ -n "${SOURCE_WORKDIR+x}" ]; then
+    volume_args=(-v "/src/project:$SOURCE_WORKDIR")
+    echo "Using volume mount ${volume_args[@]}"
+else
+    echo "No custom source code provided"
+fi
+
+docker run --rm -v /out:/out "${volume_args[@]}" -e 'FUZZING_LANGUAGE=c++' internal-builder
 
 # Build runner image
 echo "Building runner image..."
