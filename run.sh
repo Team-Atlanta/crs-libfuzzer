@@ -9,10 +9,6 @@ while ! docker info > /dev/null 2>&1; do
     sleep 1
 done
 
-# Load the runner image from tarball
-echo "Loading runner image from /out/images/runner.tar..."
-docker load -i /out/images/runner.tar
-
 # Run the runner container
 echo "Running fuzzer..."
 docker run --rm \

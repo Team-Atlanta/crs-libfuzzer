@@ -4,6 +4,14 @@ set -eu
 
 cd /app
 
+# Start Docker daemon
+start-docker.sh
+
+while ! docker info > /dev/null 2>&1; do
+    echo "Waiting for Docker to be ready..."
+    sleep 1
+done
+
 echo "Using parent image: $PARENT_IMAGE"
 
 # Load the project image from tarball
@@ -36,9 +44,3 @@ docker build \
     -f runner-internal.Dockerfile \
     -t internal-runner \
     .
-
-# Save runner image to /out/images/runner.tar
-echo "Saving runner image to /out/images/runner.tar..."
-mkdir -p /out/images
-docker save internal-runner -o /out/images/runner.tar
-echo "Runner image saved successfully"
