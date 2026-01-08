@@ -44,3 +44,5 @@ docker build \
     -f runner-internal.Dockerfile \
     -t internal-runner \
     .
+
+docker image ls

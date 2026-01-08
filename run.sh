@@ -11,6 +11,7 @@ done
 
 # Run the runner container
 echo "Running fuzzer..."
+docker image ls
 docker run --rm \
     -v /out:/out \
     -v /artifacts:/artifacts \

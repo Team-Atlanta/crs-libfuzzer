@@ -13,7 +13,4 @@ RUN git clone --depth=1 https://github.com/google/oss-fuzz.git
 COPY builder-internal.Dockerfile build.sh runner-internal.Dockerfile run_fuzzer_wrapper.sh /app/
 WORKDIR /src/project
 
-RUN mkdir -p /artifacts/docker-data /etc/docker
-RUN echo '{"data-root": "/artifacts/docker-data"}' > /etc/docker/daemon.json
-
 CMD ["/app/build.sh"]
