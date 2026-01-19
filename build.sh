@@ -15,8 +15,10 @@ done
 echo "Using parent image: $PARENT_IMAGE"
 
 # Load the project image from tarball
-echo "Loading project image from /project-image.tar..."
-docker load -i /project-image.tar
+# echo "Loading project image from /project-image.tar..."
+# docker load -i /project-image.tar
+echo "Project image should be present already"
+docker image ls
 
 # Build the internal image using the loaded image as parent
 echo "Building internal image..."
@@ -37,12 +39,5 @@ else
 fi
 
 docker run --rm -v /out:/out "${volume_args[@]}" -e 'FUZZING_LANGUAGE=c++' internal-builder
-
-# Build runner image
-echo "Building runner image..."
-docker build \
-    -f runner-internal.Dockerfile \
-    -t internal-runner \
-    .
 
 docker image ls
