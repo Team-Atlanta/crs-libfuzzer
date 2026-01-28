@@ -1,0 +1,14 @@
+services:
+  # Helper service - sleeps infinitely for testing CRS compose import
+  helper:
+    build:
+      context: .
+      dockerfile: helper.Dockerfile
+
+  # Original fuzzer service
+  fuzzer:
+    build:
+      context: .
+      dockerfile: runner.Dockerfile
+    privileged: true
+    shm_size: 2g
