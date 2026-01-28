@@ -1,0 +1,9 @@
+ARG parent_image
+FROM $parent_image
+
+COPY builder-coverage.sh /builder-coverage.sh
+RUN chmod +x /builder-coverage.sh
+
+# Run build at container start (not image build time)
+# Environment variables like FUZZING_LANGUAGE are available at runtime
+CMD ["/builder-coverage.sh"]

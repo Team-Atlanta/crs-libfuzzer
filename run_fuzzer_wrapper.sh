@@ -7,6 +7,14 @@ set -eu
 #   /work       - Working directory
 #   /artifacts  - Output artifacts (HOST_ARTIFACT_DIR)
 
+# Sync default harness binaries from /artifacts/default/ to /out/
+# This supports multi-builder workflows where binaries are built to /artifacts/default/
+if [ -d "/artifacts/default" ] && [ "$(ls -A /artifacts/default 2>/dev/null)" ]; then
+    echo "[wrapper] Syncing binaries from /artifacts/default/ to /out/"
+    rm -rf /out/*
+    cp -r /artifacts/default/* /out/
+fi
+
 HARNESS_NAME="${1:-$HARNESS_NAME}"
 shift || true
 FUZZ_TIME="${FUZZ_TIME:-3600}"

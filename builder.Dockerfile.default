@@ -1,0 +1,9 @@
+ARG parent_image
+FROM $parent_image
+
+COPY builder-default.sh /builder-default.sh
+RUN chmod +x /builder-default.sh
+
+# Run build at container start (not image build time)
+# Environment variables like FUZZING_LANGUAGE are available at runtime
+CMD ["/builder-default.sh"]

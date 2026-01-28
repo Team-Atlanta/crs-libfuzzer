@@ -1,9 +1,9 @@
 services:
-  # Helper service - sleeps infinitely for testing CRS compose import
-  helper:
+  # Coverage reporter - periodically generates llvm-cov reports from corpus seeds
+  coverage-reporter:
     build:
       context: .
-      dockerfile: helper.Dockerfile
+      dockerfile: coverage-reporter.Dockerfile
 
   # Original fuzzer service
   fuzzer:
