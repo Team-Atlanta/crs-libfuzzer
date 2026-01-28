@@ -10,25 +10,19 @@ def main():
         base_url=os.environ["LITELLM_URL"],
     )
 
-    filepath = Path("/etc/lorem.txt")
-    print("Starting!")
-
     try:
-        while True:
-            content = filepath.read_text()
+        response = client.chat.completions.create(
+            model="claude-opus-4-5-20251101",
+            messages=[
+                {
+                    "role": "user",
+                    "content": f"Describe the fuzzing process and say hello!",
+                }
+            ],
+        )
 
-            response = client.chat.completions.create(
-                model="claude-opus-4-5-20251101",
-                messages=[
-                    {
-                        "role": "user",
-                        "content": f"Describe this file:\n\n{content}",
-                    }
-                ],
-            )
-
-            print(response.choices[0].message.content)
-            print()
+        print(response.choices[0].message.content)
+        print()
 
     except Exception as e:
         print(f"\nExiting: {e}")

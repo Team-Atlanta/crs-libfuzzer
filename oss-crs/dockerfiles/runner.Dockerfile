@@ -11,8 +11,5 @@ RUN python3 -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 RUN pip install --no-cache-dir openai
 COPY ./run.py /usr/local/bin/run.py
-COPY ./run_fuzzer_wrapper.sh /usr/local/bin/run_fuzzer_wrapper.sh
-COPY ./lorem.txt /etc/lorem.txt
 RUN chmod +x /usr/local/bin/run.py
 ENTRYPOINT ["python3", "/usr/local/bin/run.py"]
-# ENTRYPOINT ["/usr/local/bin/run_fuzzer_wrapper.sh"]
