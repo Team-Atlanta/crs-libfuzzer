@@ -1,2 +1,1 @@
-ARG parent_image
-FROM $parent_image
+FROM hello-world
