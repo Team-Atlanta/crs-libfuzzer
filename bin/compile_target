@@ -1,0 +1,6 @@
+#!/bin/bash
+
+set -e
+
+compile
+libCRS submit-build-output $OUT build

@@ -7,13 +7,17 @@ set -eu
 #   /work       - Working directory
 #   /artifacts  - Output artifacts (HOST_ARTIFACT_DIR)
 
-HARNESS_NAME="${1:-$HARNESS_NAME}"
-shift || true
+HARNESS_NAME="${1:-$OSS_CRS_TARGET_HARNESS}"
+echo $HARNESS_NAME
 FUZZ_TIME="${FUZZ_TIME:-3600}"
 
 # Output directories (oss-crs structure)
 CORPUS_OUT="/artifacts/corpus"
 POV_OUT="/artifacts/povs"
+
+libCRS download-build-output build /out
+libCRS register-submit-dir pov $POV_OUT
+libCRS register-submit-dir seed $CORPUS_OUT
 
 # Seed sharing configuration
 SEED_SHARE_DIR="${SEED_SHARE_DIR:-/seed_share_dir}"
