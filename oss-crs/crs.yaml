@@ -8,7 +8,7 @@ prepare_phase:
   hcl: oss-crs/docker-bake.hcl
 
 target_build_phase:
-  build:
+  - name: build
     dockerfile: oss-crs/dockerfiles/builder.Dockerfile
     outputs:
       - build
