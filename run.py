@@ -6,8 +6,8 @@ from openai import OpenAI
 
 def main():
     client = OpenAI(
-        api_key=os.environ["LITELLM_KEY"],
-        base_url=os.environ["LITELLM_URL"],
+        api_key=os.environ["OSS_CRS_LLM_API_KEY"],
+        base_url=os.environ["OSS_CRS_LLM_API_URL"],
     )
 
     try:
