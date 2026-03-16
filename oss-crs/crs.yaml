@@ -1,8 +1,8 @@
-name: crs-libfuzzer
+name: crs-jazzer
 type:
   - bug-finding
 version: 1.0.0
-docker_registry: ghcr.io/team-atlanta/crs-libfuzzer
+docker_registry: ghcr.io/team-atlanta/crs-jazzer
 
 prepare_phase:
   hcl: oss-crs/docker-bake.hcl
@@ -22,7 +22,7 @@ supported_target:
     - full
     - delta
   language:
-    - c
+    - jvm
   sanitizer:
     - address
   architecture:
