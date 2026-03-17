@@ -95,4 +95,4 @@ trap cleanup EXIT INT TERM
     -close_fd_mask=3 \
     -reload=1 \
     --keep_going=5000 \
-    "$@" > /dev/null 2>&1 || true
+    "$@"
