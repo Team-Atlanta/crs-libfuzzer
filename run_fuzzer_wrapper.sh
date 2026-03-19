@@ -18,10 +18,7 @@ POV_OUT="/artifacts/povs"
 libCRS download-build-output build /out
 libCRS register-submit-dir pov $POV_OUT
 libCRS register-submit-dir seed $CORPUS_OUT
-
-# Seed sharing configuration
-SEED_SHARE_DIR="${SEED_SHARE_DIR:-/seed_share_dir}"
-VERBOSE="${VERBOSE:-}"
+libCRS register-fetch-dir seed $CORPUS_OUT &
 
 mkdir -p "$CORPUS_OUT" "$POV_OUT"
 
@@ -30,43 +27,6 @@ SEED_CORPUS="/out/${HARNESS_NAME}_seed_corpus"
 if [ -d "$SEED_CORPUS" ]; then
     cp -r "$SEED_CORPUS"/* "$CORPUS_OUT"/ 2>/dev/null || true
 fi
-
-log() {
-    [ -n "$VERBOSE" ] && echo "[watchdog] $*" >&2
-}
-
-# Seed watchdog: monitors SEED_SHARE_DIR using inotifywait and copies new seeds to corpus
-seed_watchdog() {
-    # Wait for directory to exist
-    while [ ! -d "$SEED_SHARE_DIR" ]; do
-        log "waiting for $SEED_SHARE_DIR to exist..."
-        sleep 1
-    done
-    log "watching $SEED_SHARE_DIR"
-
-    # Initial sync of existing files
-    for seed in "$SEED_SHARE_DIR"/*; do
-        if [ -f "$seed" ]; then
-            log "initial sync: $(basename "$seed")"
-            cp "$seed" "$CORPUS_OUT/" 2>/dev/null || true
-        fi
-    done
-
-    # Watch for new files using inotifywait
-    inotifywait -m -q -e create -e moved_to --format '%f' "$SEED_SHARE_DIR" | \
-    while read -r filename; do
-        seed="$SEED_SHARE_DIR/$filename"
-        if [ -f "$seed" ]; then
-            log "new seed: $filename"
-            cp "$seed" "$CORPUS_OUT/" 2>/dev/null || true
-        fi
-    done
-}
-
-# Cleanup handler
-cleanup() {
-    [ -n "${WATCHDOG_PID:-}" ] && kill "$WATCHDOG_PID" 2>/dev/null || true
-}
 
 # Count CPUs from range string (e.g., "0-7" or "0,2,4-6")
 count_cpus() {
@@ -81,11 +41,6 @@ count_cpus() {
 }
 
 FORK_JOBS="${FORK_JOBS:-$(count_cpus "${CPUSET_CPUS:-0}")}"
-
-# Start seed watchdog in background
-seed_watchdog &
-WATCHDOG_PID=$!
-trap cleanup EXIT INT TERM
 
 # Run libfuzzer in fork mode with crash tolerance
 "/out/${HARNESS_NAME}" \
