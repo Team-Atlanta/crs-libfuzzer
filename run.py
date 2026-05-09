@@ -6,7 +6,7 @@ from openai import OpenAI
 
 def main():
     client = OpenAI(
-        api_key=os.environ["OSS_CRS_LLM_API_KEY"],
+        api_key=open(os.environ["OSS_CRS_LLM_API_KEY_FILE"]).read().strip() if os.environ.get("OSS_CRS_LLM_API_KEY_FILE") else os.environ["OSS_CRS_LLM_API_KEY"],
         base_url=os.environ["OSS_CRS_LLM_API_URL"],
     )
 
