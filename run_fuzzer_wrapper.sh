@@ -9,7 +9,6 @@ set -eu
 
 HARNESS_NAME="${1:-$OSS_CRS_TARGET_HARNESS}"
 echo $HARNESS_NAME
-FUZZ_TIME="${FUZZ_TIME:-3600}"
 
 # Output directories (oss-crs structure)
 CORPUS_OUT="/artifacts/corpus"
@@ -40,13 +39,12 @@ count_cpus() {
     echo "$count"
 }
 
-FORK_JOBS="${FORK_JOBS:-$(count_cpus "${CPUSET_CPUS:-0}")}"
+FORK_JOBS="${FORK_JOBS:-$(count_cpus "${OSS_CRS_CPUSET:-0}")}"
 
 # Run libfuzzer in fork mode with crash tolerance
 "/out/${HARNESS_NAME}" \
     "$CORPUS_OUT" \
     -artifact_prefix="${POV_OUT}/" \
-    -max_total_time="$FUZZ_TIME" \
     -fork="$FORK_JOBS" \
     -ignore_crashes=1 \
     -ignore_timeouts=1 \
