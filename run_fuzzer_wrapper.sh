@@ -41,7 +41,23 @@ count_cpus() {
 
 FORK_JOBS="${FORK_JOBS:-$(count_cpus "${OSS_CRS_CPUSET:-0}")}"
 
-# Run libfuzzer in fork mode with crash tolerance
+# Capture output to the oss-crs log dir (mounted rw) instead of /dev/null so
+# failures stay diagnosable. Falls back to /work if OSS_CRS_LOG_DIR is unset.
+LOG_DIR="${OSS_CRS_LOG_DIR:-/work}"
+mkdir -p "$LOG_DIR"
+STDOUT_LOG="$LOG_DIR/stdout.log"
+STDERR_LOG="$LOG_DIR/stderr.log"
+
+# Preflight: ensure the harness binary can actually load
+if ! "/out/${HARNESS_NAME}" -help=1 >>"$STDOUT_LOG" 2>>"$STDERR_LOG"; then
+    echo "[run_fuzzer_wrapper] FATAL: harness '${HARNESS_NAME}' failed to start; see ${STDERR_LOG}" >&2
+    tail -n 20 "$STDERR_LOG" >&2 2>/dev/null || true
+    exit 1
+fi
+
+# Run libfuzzer in fork mode with crash tolerance. The trailing "|| true" only
+# tolerates crash/oom/timeout exits from the fuzzing loop itself; stdout/stderr
+# go to the log dir so real failures remain visible.
 "/out/${HARNESS_NAME}" \
     "$CORPUS_OUT" \
     -artifact_prefix="${POV_OUT}/" \
@@ -52,4 +68,4 @@ FORK_JOBS="${FORK_JOBS:-$(count_cpus "${OSS_CRS_CPUSET:-0}")}"
     -detect_leaks=0 \
     -close_fd_mask=3 \
     -reload=1 \
-    "$@" > /dev/null 2>&1 || true
+    "$@" >>"$STDOUT_LOG" 2>>"$STDERR_LOG" || true
