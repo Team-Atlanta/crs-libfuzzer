@@ -1,9 +1,9 @@
 ARG target_base_image
 FROM $target_base_image
 
-# Install libCRS
-COPY --from=libcrs . /libCRS
-RUN /libCRS/install.sh
+COPY --from=oss-crs-deps /nix/store /nix/store
+COPY --from=oss-crs-deps /usr/local/bin/libCRS /usr/local/bin/libCRS
+COPY --from=oss-crs-deps /usr/local/bin/rsync /usr/local/bin/rsync
 
 COPY bin/compile_target /usr/local/bin/compile_target
 
